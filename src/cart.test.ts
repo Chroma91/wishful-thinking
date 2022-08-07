@@ -1,4 +1,4 @@
-import { addToCart } from "./actions/cart";
+import { addToCart, removeFromCart } from "./actions/cart";
 import { Cart } from "./entities/cart";
 import { Product } from "./entities/product";
 
@@ -14,10 +14,20 @@ describe("Cart", () => {
   });
 
   it("removes an item from the cart", () => {
-    // TODO: 1. implement new code with TDD
+    const productId = 1;
+    const cart: Cart = {
+      quantity: 5,
+      sum: 50,
+      items: [{ productId: productId, quantity: 5, price: 10 }],
+    };
+
+    removeFromCart(cart, productId);
+
+    expect(cart.sum).toBe(0);
+    expect(cart.quantity).toBe(0);
+    expect(cart.items.length).toBe(0);
   });
 
-  // TODO: 1. implement "new" code with TDD
   it("updates an item in the cart", () => {
     const cart: Cart = { quantity: 0, sum: 0, items: [] };
     const product: Product = { id: 1, price: 10, name: "Test" };

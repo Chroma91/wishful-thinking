@@ -9,16 +9,51 @@ export function addToCart(cart: Cart, product: Product, quantity = 1) {
     throw new Error("quantity needs to be greater or equal to 1");
   }
 
-  // TODO: 2. code smell / bug -> it should increase quantity when already in cart
   const item: CartItem = {
     productId: product.id,
     quantity,
     price: product.price,
   };
 
-  cart.items.push(item);
+  const existingIndex = cart.items.findIndex(
+    (item) => item.productId === item.productId
+  );
+
+  if (existingIndex > -1) {
+    const cartItem = cart.items[existingIndex];
+    const newQuantity = cartItem.quantity + item.quantity;
+    const newSum = cartItem.price * newQuantity;
+
+    cart.items[existingIndex] = {
+      ...cartItem,
+      quantity: cartItem.quantity + quantity,
+      price: item.price,
+    };
+    cart.sum += newSum - cartItem.price * cartItem.quantity;
+  } else {
+    cart.items.push(item);
+    cart.sum += item.price * item.quantity;
+  }
+
   cart.quantity += item.quantity;
-  cart.sum += item.price * item.quantity;
 
   return item;
+}
+
+export function removeFromCart(cart: Cart, productId: number) {
+  const cartItemIndex = cart.items.findIndex(
+    (item) => item.productId === productId
+  );
+
+  if (cartItemIndex < 0) {
+    throw new Error("product is not in cart");
+  }
+
+  const cartItem = cart.items[cartItemIndex];
+
+  cart.quantity -= cartItem.quantity;
+  cart.sum -= cartItem.quantity * cartItem.price;
+  cart.items = cart.items.filter((_, index) => index !== cartItemIndex);
+
+  return cart;
 }
