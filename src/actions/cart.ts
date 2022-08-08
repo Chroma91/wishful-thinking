@@ -2,7 +2,6 @@ import { Cart } from "../entities/cart";
 import { CartItem } from "../entities/cartItem";
 import { Product } from "../entities/product";
 
-// TODO: 2. code smell
 // TODO: 3. change code to class
 export function addToCart(cart: Cart, product: Product, quantity = 1) {
   if (quantity < 1) {
@@ -20,19 +19,9 @@ export function addToCart(cart: Cart, product: Product, quantity = 1) {
   );
 
   if (existingIndex > -1) {
-    const cartItem = cart.items[existingIndex];
-    const newQuantity = cartItem.quantity + item.quantity;
-    const newSum = cartItem.price * newQuantity;
-
-    cart.items[existingIndex] = {
-      ...cartItem,
-      quantity: cartItem.quantity + quantity,
-      price: item.price,
-    };
-    cart.sum += newSum - cartItem.price * cartItem.quantity;
+    updateCartItemAt(existingIndex, cart, item);
   } else {
-    cart.items.push(item);
-    cart.sum += item.price * item.quantity;
+    addCartItem(cart, item);
   }
 
   cart.quantity += item.quantity;
@@ -56,4 +45,24 @@ export function removeFromCart(cart: Cart, productId: number) {
   cart.items = cart.items.filter((_, index) => index !== cartItemIndex);
 
   return cart;
+}
+
+function addCartItem(cart: Cart, item: CartItem) {
+  cart.items.push(item);
+  cart.sum += item.price * item.quantity;
+
+  return cart;
+}
+
+function updateCartItemAt(existingIndex: number, cart: Cart, item: CartItem) {
+  const cartItem = cart.items[existingIndex];
+  const newQuantity = cartItem.quantity + item.quantity;
+  const newSum = cartItem.price * newQuantity;
+
+  cart.items[existingIndex] = {
+    ...cartItem,
+    quantity: cartItem.quantity + item.quantity,
+    price: item.price,
+  };
+  cart.sum += newSum - cartItem.price * cartItem.quantity;
 }
